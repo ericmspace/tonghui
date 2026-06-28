@@ -9,9 +9,13 @@ import {
 import { cx } from "~/lib/cx";
 import { Button } from "~/components/ui/primitives";
 
+export type StrokePoint = { x: number; y: number; t: number };
+
 export type DrawingCanvasHandle = {
   exportPNG: () => string;
   loadImage: (src: string) => void;
+  /** 返回到目前为止记录的全部画笔笔迹（按抬笔分段，仅 brush 工具），供语音引导检测使用 */
+  getStrokes: () => StrokePoint[][];
 };
 
 type Tool = "brush" | "eraser" | "fill";
@@ -31,6 +35,10 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, { initialImage?: st
     const ctxRef = useRef<CanvasRenderingContext2D | null>(null);
     const drawing = useRef(false);
     const last = useRef<{ x: number; y: number } | null>(null);
+
+    // 笔迹记录（x,y,t）：供语音引导的完成检测使用；只记 brush 笔
+    const strokes = useRef<StrokePoint[][]>([]);
+    const curStroke = useRef<StrokePoint[] | null>(null);
 
     const [tool, setTool] = useState<Tool>("brush");
     const [color, setColor] = useState("#ff6b2c");
@@ -108,6 +116,7 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, { initialImage?: st
     useImperativeHandle(ref, () => ({
       exportPNG: () => canvasRef.current?.toDataURL("image/png") ?? "",
       loadImage,
+      getStrokes: () => strokes.current.map((s) => s.slice()),
     }));
 
     /* ---------- 坐标换算 ---------- */
@@ -168,6 +177,13 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, { initialImage?: st
       }
       drawing.current = true;
       last.current = p;
+      // 仅记录 brush 笔迹（橡皮不计入），开启新的一笔
+      if (tool === "brush") {
+        curStroke.current = [{ x: p.x, y: p.y, t: Date.now() }];
+        strokes.current.push(curStroke.current);
+      } else {
+        curStroke.current = null;
+      }
       // 画一个点
       ctx.beginPath();
       ctx.fillStyle = tool === "eraser" ? "#ffffff" : color;
@@ -187,12 +203,14 @@ export const DrawingCanvas = forwardRef<DrawingCanvasHandle, { initialImage?: st
       ctx.lineTo(p.x, p.y);
       ctx.stroke();
       last.current = p;
+      if (curStroke.current) curStroke.current.push({ x: p.x, y: p.y, t: Date.now() });
     };
 
     const onUp = () => {
       if (!drawing.current) return;
       drawing.current = false;
       last.current = null;
+      curStroke.current = null;
       snapshot();
     };
 

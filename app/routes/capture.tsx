@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
 import { AppShell } from "~/components/layout/AppShell";
-import { CameraCapture } from "~/components/camera/CameraCapture";
+import { CameraCapture, type CameraCaptureHandle } from "~/components/camera/CameraCapture";
+import { CameraVoiceGuidePanel } from "~/components/camera/CameraVoiceGuidePanel";
 import { Button, Panel, Badge, Toggle, Spinner } from "~/components/ui/primitives";
 import { Modal } from "~/components/ui/Modal";
 
@@ -12,11 +13,16 @@ const CANVAS_KEY = "th_canvas_image";
 
 export default function Capture() {
   const navigate = useNavigate();
+  const cameraRef = useRef<CameraCaptureHandle>(null);
   const [captured, setCaptured] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [colored, setColored] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [result, setResult] = useState<{ image: string; mocked: boolean } | null>(null);
+
+  const captureFrame = useCallback(() => {
+    return cameraRef.current?.captureFrame({ maxWidth: 192, maxHeight: 144 }) ?? null;
+  }, []);
 
   const onCapture = (dataUrl: string) => {
     setCaptured(dataUrl);
@@ -54,7 +60,10 @@ export default function Capture() {
       <div className="grid lg:grid-cols-2 gap-6 items-start">
         {/* 左：摄像头 */}
         <Panel title="① 拍摄" subtitle="对准实物，点按拍摄一张照片">
-          <CameraCapture onCapture={onCapture} />
+          <div className="space-y-4">
+            <CameraCapture ref={cameraRef} onCapture={onCapture} />
+            <CameraVoiceGuidePanel captureFrame={captureFrame} />
+          </div>
         </Panel>
 
         {/* 右：转换结果 */}

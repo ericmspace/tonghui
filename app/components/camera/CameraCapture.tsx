@@ -1,15 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react";
 import { Button, Spinner } from "~/components/ui/primitives";
 
 type Props = {
   onCapture: (dataUrl: string) => void;
 };
 
+export type CameraCaptureHandle = {
+  captureFrame: (options?: { maxWidth?: number; maxHeight?: number }) => ImageData | null;
+};
+
 /**
  * 摄像头采集：getUserMedia 实时预览 + 抓帧。
  * 兼容无摄像头/拒绝授权场景：自动提供"上传图片"回退。
  */
-export function CameraCapture({ onCapture }: Props) {
+export const CameraCapture = forwardRef<CameraCaptureHandle, Props>(function CameraCapture(
+  { onCapture },
+  ref
+) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">("loading");
@@ -42,18 +49,46 @@ export function CameraCapture({ onCapture }: Props) {
     };
   }, [start]);
 
+  const captureToCanvas = useCallback(
+    (maxWidth?: number, maxHeight?: number) => {
+      const video = videoRef.current;
+      if (!video || status !== "ready") return null;
+      const sourceW = video.videoWidth || 1280;
+      const sourceH = video.videoHeight || 960;
+      const scale = Math.min(
+        maxWidth ? maxWidth / sourceW : 1,
+        maxHeight ? maxHeight / sourceH : 1,
+        1
+      );
+      const w = Math.max(1, Math.round(sourceW * scale));
+      const h = Math.max(1, Math.round(sourceH * scale));
+      const canvas = document.createElement("canvas");
+      canvas.width = w;
+      canvas.height = h;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return null;
+      ctx.drawImage(video, 0, 0, w, h);
+      return { canvas, ctx, w, h };
+    },
+    [status]
+  );
+
+  useImperativeHandle(
+    ref,
+    () => ({
+      captureFrame: (options) => {
+        const frame = captureToCanvas(options?.maxWidth ?? 192, options?.maxHeight ?? 144);
+        if (!frame) return null;
+        return frame.ctx.getImageData(0, 0, frame.w, frame.h);
+      },
+    }),
+    [captureToCanvas]
+  );
+
   const capture = () => {
-    const video = videoRef.current;
-    if (!video || status !== "ready") return;
-    const w = video.videoWidth || 1280;
-    const h = video.videoHeight || 960;
-    const canvas = document.createElement("canvas");
-    canvas.width = w;
-    canvas.height = h;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    ctx.drawImage(video, 0, 0, w, h);
-    onCapture(canvas.toDataURL("image/png"));
+    const frame = captureToCanvas();
+    if (!frame) return;
+    onCapture(frame.canvas.toDataURL("image/png"));
   };
 
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -122,4 +157,4 @@ export function CameraCapture({ onCapture }: Props) {
       </div>
     </div>
   );
-}
+});

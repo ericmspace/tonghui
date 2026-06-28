@@ -3,6 +3,7 @@ import { Link } from "@remix-run/react";
 import type { MetaFunction } from "@remix-run/node";
 import { AppShell } from "~/components/layout/AppShell";
 import { DrawingCanvas, type DrawingCanvasHandle } from "~/components/canvas/DrawingCanvas";
+import { VoiceGuidePanel } from "~/components/canvas/VoiceGuidePanel";
 import { Button, Badge } from "~/components/ui/primitives";
 import { downloadBlob } from "~/lib/utils";
 
@@ -44,13 +45,17 @@ export default function CanvasPage() {
         fromCapture ? <Badge tone="mint">已载入简笔绘本</Badge> : <Badge tone="neutral">空白画布</Badge>
       }
     >
-      <div className="grid lg:grid-cols-[1fr_280px] gap-6 items-start">
-        <DrawingCanvas ref={ref} initialImage={initial} />
+      <div className="space-y-6">
+        {/* 语音引导：整行置顶，醒目可见 */}
+        <VoiceGuidePanel getStrokes={() => ref.current?.getStrokes() ?? []} />
 
-        {/* 侧栏操作 */}
-        <aside className="space-y-4 lg:sticky lg:top-24">
-          <div className="glass rounded-4xl p-5">
-            <h3 className="font-bold text-ink mb-1">完成作品</h3>
+        <div className="grid lg:grid-cols-[1fr_280px] gap-6 items-start">
+          <DrawingCanvas ref={ref} initialImage={initial} />
+
+          {/* 侧栏操作 */}
+          <aside className="space-y-4 lg:sticky lg:top-24">
+            <div className="glass rounded-4xl p-5">
+              <h3 className="font-bold text-ink mb-1">完成作品</h3>
             <p className="text-xs text-ink-muted mb-4">导出，或继续用作品生成视频与故事。</p>
             <div className="space-y-2.5">
               <Button onClick={exportPNG} className="w-full">
@@ -81,6 +86,7 @@ export default function CanvasPage() {
             </ul>
           </div>
         </aside>
+        </div>
       </div>
     </AppShell>
   );
