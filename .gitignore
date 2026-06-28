@@ -1,0 +1,13 @@
+node_modules
+
+/.cache
+/build
+/.env
+/data
+
+.DS_Store
+*.local
+.vite
+
+# Claude Code 本地设置
+.claude/settings.local.json
