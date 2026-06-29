@@ -17,6 +17,8 @@ export type SourceStatus = "sim" | "ws-connecting" | "ws-open" | "ws-fallback";
 interface StartOpts {
   source?: SourceKind;
   wsUrl?: string;
+  // 原始帧旁路：在分析之外再拿到每一帧（如笔姿态估计），不受 UI 节流影响
+  onFrame?: (f: ImuFrame) => void;
 }
 
 interface Source {
@@ -44,7 +46,9 @@ export function useImuMonitor() {
       const ana = new RealtimeImuAnalyzer();
       anaRef.current = ana;
       frameCount.current = 0;
+      const tap = opts?.onFrame;
       const onFrame = (f: ImuFrame) => {
+        tap?.(f); // 原始帧旁路（姿态估计等），每帧都给
         const st = ana.push(f);
         frameCount.current++;
         if (frameCount.current % UI_THROTTLE === 0) setState(st);

@@ -4,6 +4,7 @@ import type { MetaFunction } from "@remix-run/node";
 import { AppShell } from "~/components/layout/AppShell";
 import { CameraCapture, type CameraCaptureHandle } from "~/components/camera/CameraCapture";
 import { CameraVoiceGuidePanel } from "~/components/camera/CameraVoiceGuidePanel";
+import { PenPoseCard } from "~/components/camera/PenPoseCard";
 import { Button, Panel, Badge, Toggle, Spinner } from "~/components/ui/primitives";
 import { Modal } from "~/components/ui/Modal";
 
@@ -109,6 +110,15 @@ export default function Capture() {
           )}
         </Panel>
       </div>
+
+      {/* 笔姿态实时检测 */}
+      <Panel
+        className="mt-6"
+        title="③ 笔姿态实时检测"
+        subtitle="根据笔端 IMU 实时同步笔的姿态（笔建模为沿 Y 轴的圆柱）"
+      >
+        <PenPoseCard />
+      </Panel>
 
       {/* 是否导入 弹窗 */}
       <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title="是否导入这张照片？">
