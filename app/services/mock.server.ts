@@ -80,6 +80,14 @@ export function mockStory(): { title: string; description: string; story: string
   };
 }
 
+/** Mock 看图组句结果（与 mockColoringImage 的小屋大树画面呼应） */
+export function mockSentence(): { sentence: string; chunks: string[] } {
+  return {
+    sentence: "小房子旁边有一棵大树",
+    chunks: ["小房子", "旁边", "有一棵", "大树"],
+  };
+}
+
 /** Mock 情绪识别结果 */
 export function mockEmotion() {
   return {

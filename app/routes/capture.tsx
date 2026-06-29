@@ -5,6 +5,7 @@ import { AppShell } from "~/components/layout/AppShell";
 import { CameraCapture, type CameraCaptureHandle } from "~/components/camera/CameraCapture";
 import { CameraVoiceGuidePanel } from "~/components/camera/CameraVoiceGuidePanel";
 import { PenPoseCard } from "~/components/camera/PenPoseCard";
+import { SentencePractice } from "~/components/sentence/SentencePractice";
 import { Button, Panel, Badge, Toggle, Spinner } from "~/components/ui/primitives";
 import { Modal } from "~/components/ui/Modal";
 
@@ -120,6 +121,17 @@ export default function Capture() {
           </Panel>
         </div>
       </div>
+
+      {/* 组句练习 */}
+      {result && (
+        <Panel
+          className="mt-6"
+          title="④ 组句练习"
+          subtitle="AI 看图编一句话，按词组打乱，孩子点选词卡拼回完整句子"
+        >
+          <SentencePractice image={result.image} />
+        </Panel>
+      )}
 
       {/* 是否导入 弹窗 */}
       <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title="是否导入这张照片？">
