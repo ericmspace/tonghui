@@ -396,67 +396,6 @@ export function CameraVoiceGuidePanel({
         {status === "done" && <Badge tone="mint">已完成</Badge>}
       </div>
 
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-ink-muted shrink-0">孩子</span>
-        <input
-          value={childName}
-          disabled={running}
-          onChange={(e) => setChildName(e.target.value)}
-          className="flex-1 h-9 px-3 rounded-full hairline bg-white/70 text-sm text-ink disabled:opacity-50 outline-none focus:ring-2 ring-brand-200"
-          placeholder="孩子名字"
-        />
-      </div>
-
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-ink-muted shrink-0">数据源</span>
-        <div className="inline-flex p-1 rounded-full bg-black/[0.05]">
-          {([["sim", "模拟"], ["ws", "真实笔"]] as ["sim" | "ws", string][]).map(([v, l]) => (
-            <button
-              key={v}
-              type="button"
-              disabled={running}
-              onClick={() => setImuSource(v)}
-              className={cx(
-                "px-3 h-7 rounded-full text-xs font-semibold transition disabled:opacity-50",
-                imuSource === v ? "bg-white text-ink shadow-soft" : "text-ink-muted hover:text-ink-soft"
-              )}
-            >
-              {l}
-            </button>
-          ))}
-        </div>
-        {imuSource === "ws" && running && (
-          <span className="text-[11px] text-ink-faint">
-            {monitor.status === "ws-open"
-              ? bridgeMode === "serial"
-                ? "● 真实笔 · 串口数据"
-                : bridgeMode === "sim"
-                ? "● 已连桥 · 模拟数据(经WS)"
-                : "● 已连桥"
-              : monitor.status === "ws-connecting"
-              ? "○ 连接中…"
-              : monitor.status === "ws-fallback"
-              ? "⚠ 未连到桥 · 本地模拟"
-              : ""}
-          </span>
-        )}
-      </div>
-
-      <div className="flex items-center gap-2">
-        <span className="text-xs text-ink-muted shrink-0">AI 判形状</span>
-        <button
-          type="button"
-          disabled={running}
-          onClick={() => setAiShape((v) => !v)}
-          className={cx(
-            "px-3 h-7 rounded-full text-xs font-semibold transition disabled:opacity-50",
-            aiShape ? "bg-white text-ink shadow-soft ring-2 ring-brand-200" : "bg-black/[0.04] text-ink-muted hover:text-ink-soft"
-          )}
-        >
-          {aiShape ? "开 · AI 看画判对错" : "关 · 只看有没有动笔"}
-        </button>
-      </div>
-
       <div className="flex flex-wrap gap-2">
         {(Object.entries(THEMES) as [ThemeId, (typeof THEMES)[ThemeId]][]).map(([id, item]) => (
           <button

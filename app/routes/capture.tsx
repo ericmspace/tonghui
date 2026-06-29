@@ -71,54 +71,55 @@ export default function Capture() {
           </div>
         </Panel>
 
-        {/* 右：转换结果 */}
-        <Panel
-          title="② 简笔绘本"
-          subtitle="AI 把照片扫描矫正为可涂色的简笔填块绘本"
-          right={result?.mocked ? <Badge tone="warn">Mock 兜底</Badge> : result ? <Badge tone="mint">已生成</Badge> : null}
-        >
-          {!result && !processing && (
-            <div className="aspect-[4/3] rounded-4xl grid place-items-center text-center hairline bg-white/40">
-              <div className="text-ink-faint">
-                <div className="text-5xl mb-3">🎨</div>
-                <p className="text-sm">拍摄后将在此显示简笔绘本</p>
+        {/* 右：转换结果 + 笔姿态实时检测 */}
+        <div className="space-y-6">
+          <Panel
+            title="② 简笔绘本"
+            subtitle="AI 把照片扫描矫正为可涂色的简笔填块绘本"
+            right={result?.mocked ? <Badge tone="warn">Mock 兜底</Badge> : result ? <Badge tone="mint">已生成</Badge> : null}
+          >
+            {!result && !processing && (
+              <div className="aspect-[4/3] rounded-4xl grid place-items-center text-center hairline bg-white/40">
+                <div className="text-ink-faint">
+                  <div className="text-5xl mb-3">🎨</div>
+                  <p className="text-sm">拍摄后将在此显示简笔绘本</p>
+                </div>
               </div>
-            </div>
-          )}
-          {processing && (
-            <div className="aspect-[4/3] rounded-4xl grid place-items-center hairline bg-white/40">
-              <div className="flex flex-col items-center gap-3 text-ink-muted">
-                <Spinner className="w-8 h-8 text-brand-500" />
-                <p className="text-sm">正在扫描并转化为简笔绘本…</p>
+            )}
+            {processing && (
+              <div className="aspect-[4/3] rounded-4xl grid place-items-center hairline bg-white/40">
+                <div className="flex flex-col items-center gap-3 text-ink-muted">
+                  <Spinner className="w-8 h-8 text-brand-500" />
+                  <p className="text-sm">正在扫描并转化为简笔绘本…</p>
+                </div>
               </div>
-            </div>
-          )}
-          {result && (
-            <div className="space-y-4">
-              <div className="rounded-4xl overflow-hidden hairline bg-white">
-                <img src={result.image} alt="简笔绘本" className="w-full" />
+            )}
+            {result && (
+              <div className="space-y-4">
+                <div className="rounded-4xl overflow-hidden hairline bg-white">
+                  <img src={result.image} alt="简笔绘本" className="w-full" />
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  <Button onClick={goCanvas} size="lg">
+                    🖍️ 进入画板涂色
+                  </Button>
+                  <Button variant="outline" onClick={() => setConfirmOpen(true)}>
+                    重新转换
+                  </Button>
+                </div>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <Button onClick={goCanvas} size="lg">
-                  🖍️ 进入画板涂色
-                </Button>
-                <Button variant="outline" onClick={() => setConfirmOpen(true)}>
-                  重新转换
-                </Button>
-              </div>
-            </div>
-          )}
-        </Panel>
-      </div>
+            )}
+          </Panel>
 
-      {/* 笔姿态实时检测 */}
-      <Panel
-        className="mt-6"
-        title="③ 笔姿态实时检测"
-        subtitle="根据笔端 IMU 实时同步笔的姿态（笔建模为沿 Y 轴的圆柱）"
-      >
-        <PenPoseCard />
-      </Panel>
+          {/* 笔姿态实时检测 */}
+          <Panel
+            title="③ 笔姿态实时检测"
+            subtitle="根据笔端 IMU 实时同步笔的姿态（3D 笔模型）"
+          >
+            <PenPoseCard />
+          </Panel>
+        </div>
+      </div>
 
       {/* 是否导入 弹窗 */}
       <Modal open={confirmOpen} onClose={() => setConfirmOpen(false)} title="是否导入这张照片？">

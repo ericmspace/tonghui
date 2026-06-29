@@ -105,7 +105,7 @@ function TopBar({
   actions?: React.ReactNode;
 }) {
   return (
-    <header className="sticky top-0 z-30 px-6 lg:px-10 py-5">
+    <header className="px-6 lg:px-10 py-5">
       <div className="flex items-center justify-between gap-4 max-w-[1400px] mx-auto w-full">
         <div>
           {title && <h1 className="text-2xl lg:text-[28px] font-extrabold text-ink tracking-tight">{title}</h1>}
