@@ -24,6 +24,10 @@ export default function Capture() {
     return cameraRef.current?.captureFrame({ maxWidth: 192, maxHeight: 144 }) ?? null;
   }, []);
 
+  const captureDataUrl = useCallback(() => {
+    return cameraRef.current?.captureDataUrl({ maxWidth: 640, maxHeight: 480 }) ?? null;
+  }, []);
+
   const onCapture = (dataUrl: string) => {
     setCaptured(dataUrl);
     setResult(null);
@@ -62,7 +66,7 @@ export default function Capture() {
         <Panel title="① 拍摄" subtitle="对准实物，点按拍摄一张照片">
           <div className="space-y-4">
             <CameraCapture ref={cameraRef} onCapture={onCapture} />
-            <CameraVoiceGuidePanel captureFrame={captureFrame} />
+            <CameraVoiceGuidePanel captureFrame={captureFrame} captureDataUrl={captureDataUrl} />
           </div>
         </Panel>
 

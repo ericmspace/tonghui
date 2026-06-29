@@ -64,6 +64,8 @@ export function useVoiceGuide(getStrokes: () => Stroke[]) {
   const [state, setState] = useState<GuideState>(INITIAL);
   const cancelRef = useRef(false);
   const logRef = useRef<SessionLog | null>(null);
+  // 手动完成信号：无数字画布（如 /capture 摄像头页）时，由操作者点「完成这一步」推进
+  const manualDoneRef = useRef(false);
 
   const patch = useCallback((p: Partial<GuideState>) => {
     setState((s) => ({ ...s, ...p }));
@@ -85,6 +87,10 @@ export function useVoiceGuide(getStrokes: () => Stroke[]) {
       const deadline = Date.now() + step.response_window_sec * 1000;
       while (Date.now() < deadline) {
         if (cancelRef.current) return false;
+        if (manualDoneRef.current) {
+          manualDoneRef.current = false;
+          return true;
+        }
         const fresh = getStrokes().slice(baseIndex);
         if (detect(fresh, step.detector_params)) return true;
         await sleep(300);
@@ -98,6 +104,7 @@ export function useVoiceGuide(getStrokes: () => Stroke[]) {
     async (step: ScriptStep): Promise<StepLog> => {
       const levels = LEVELS.filter((l) => step.prompts[l]);
       const baseIndex = getStrokes().length; // 仅评估此步新增的笔
+      manualDoneRef.current = false; // 清除上一步可能残留的手动信号
       let reached: PromptLevel | null = null;
       let completed = false;
       let latency: number | null = null;
@@ -192,5 +199,10 @@ export function useVoiceGuide(getStrokes: () => Stroke[]) {
 
   const lastLog = useCallback(() => logRef.current, []);
 
-  return { state, start, stop, lastLog };
+  // 操作者点「完成这一步」时调用，让当前步骤即时判定为完成
+  const signalDone = useCallback(() => {
+    manualDoneRef.current = true;
+  }, []);
+
+  return { state, start, stop, lastLog, signalDone };
 }

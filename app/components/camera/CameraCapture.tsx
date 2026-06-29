@@ -7,6 +7,8 @@ type Props = {
 
 export type CameraCaptureHandle = {
   captureFrame: (options?: { maxWidth?: number; maxHeight?: number }) => ImageData | null;
+  /** 抓一帧为 JPEG dataURL（给 AI 判形状用，分辨率适中以省带宽） */
+  captureDataUrl: (options?: { maxWidth?: number; maxHeight?: number; quality?: number }) => string | null;
 };
 
 /**
@@ -80,6 +82,11 @@ export const CameraCapture = forwardRef<CameraCaptureHandle, Props>(function Cam
         const frame = captureToCanvas(options?.maxWidth ?? 192, options?.maxHeight ?? 144);
         if (!frame) return null;
         return frame.ctx.getImageData(0, 0, frame.w, frame.h);
+      },
+      captureDataUrl: (options) => {
+        const frame = captureToCanvas(options?.maxWidth ?? 640, options?.maxHeight ?? 480);
+        if (!frame) return null;
+        return frame.canvas.toDataURL("image/jpeg", options?.quality ?? 0.7);
       },
     }),
     [captureToCanvas]
