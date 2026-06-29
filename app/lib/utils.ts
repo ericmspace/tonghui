@@ -32,18 +32,8 @@ export const MODULES = [
     accent: "from-brand-400 to-peach",
   },
   {
-    id: "unity",
-    no: "02",
-    href: "/unity",
-    title: "可编辑场景",
-    subtitle: "Unity · 留白结构",
-    desc: "面向沉浸式场景搭建的可视化编辑骨架，先留白结构，后续接入 Unity WebGL。",
-    icon: "🧩",
-    accent: "from-sky to-lavender",
-  },
-  {
     id: "video",
-    no: "03",
+    no: "02",
     href: "/video",
     title: "绘本生视频",
     subtitle: "图生视频 · 探索漫游",
@@ -53,7 +43,7 @@ export const MODULES = [
   },
   {
     id: "story",
-    no: "04",
+    no: "03",
     href: "/story",
     title: "看图讲故事",
     subtitle: "看图 · 成文 · 配音 · 隐写",
@@ -63,7 +53,7 @@ export const MODULES = [
   },
   {
     id: "iep",
-    no: "05",
+    no: "04",
     href: "/iep",
     title: "IEP 数据分析",
     subtitle: "表现指标 · 情绪 · 成长趋势",
@@ -73,7 +63,7 @@ export const MODULES = [
   },
   {
     id: "library",
-    no: "06",
+    no: "05",
     href: "/library",
     title: "创作记录",
     subtitle: "经历归档 · 隐写回溯",

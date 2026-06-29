@@ -5,6 +5,7 @@ import { AppShell } from "~/components/layout/AppShell";
 import { CameraCapture, type CameraCaptureHandle } from "~/components/camera/CameraCapture";
 import { CameraVoiceGuidePanel } from "~/components/camera/CameraVoiceGuidePanel";
 import { PenPoseCard } from "~/components/camera/PenPoseCard";
+import { SentencePractice } from "~/components/sentence/SentencePractice";
 import { Button, Panel, Badge, Toggle, Spinner } from "~/components/ui/primitives";
 import { Modal } from "~/components/ui/Modal";
 
@@ -111,10 +112,21 @@ export default function Capture() {
         </Panel>
       </div>
 
+      {/* 组句练习 */}
+      {result && (
+        <Panel
+          className="mt-6"
+          title="③ 组句练习"
+          subtitle="AI 看图编一句话，按词组打乱，孩子点选词卡拼回完整句子"
+        >
+          <SentencePractice image={result.image} />
+        </Panel>
+      )}
+
       {/* 笔姿态实时检测 */}
       <Panel
         className="mt-6"
-        title="③ 笔姿态实时检测"
+        title="④ 笔姿态实时检测"
         subtitle="根据笔端 IMU 实时同步笔的姿态（笔建模为沿 Y 轴的圆柱）"
       >
         <PenPoseCard />
